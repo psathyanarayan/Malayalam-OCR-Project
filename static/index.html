@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>OCR Malayalam</title>
+    <style>
+        body {
+            background: linear-gradient(to bottom, #667eea, #764ba2);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            background: #fff;
+            padding: 30px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            width: 400px;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .file-input-label {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            display: inline-block;
+        }
+
+        #fileInputLabel {
+            margin: 20px 0;
+        }
+
+        #result {
+            width: 100%;
+            height: 200px;
+            padding: 10px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            resize: none;
+            margin-top: 20px;
+        }
+
+        #submitBtn {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+            height: 38px;
+            width: 126px;
+        }
+
+        #submitBtn:hover {
+            background-color: #45a049;
+        }
+
+        #cameraBtn {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+            height: 38px;
+            width: 126px;
+        }
+
+        #cameraBtn:hover {
+            background-color: #45a049;
+        }
+
+        #preview {
+            display: none;
+            width: 100%;
+            height: auto;
+            margin-top: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        #captureBtn {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+            height: 38px;
+            width: 126px;
+            display: none;
+        }
+
+        #captureBtn:hover {
+            background-color: #45a049;
+        }
+
+        #translateBtn {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+            height: 38px;
+            width: 126px;
+        }
+
+        #translateBtn:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>OCR Malayalam</h1>
+        <form id="uploadForm" enctype="multipart/form-data">
+            <label for="fileInput" class="file-input-label" id="fileInputLabel">Choose File</label>
+            <input type="file" id="fileInput" accept="image/*" required>
+            <input type="submit" id="submitBtn" value="Scan OCR">
+        </form>
+        <textarea id="result" readonly></textarea>
+        <button id="cameraBtn">Capture from Camera</button>
+        <video id="preview" autoplay></video>
+        <button id="captureBtn">Capture</button>
+        <button id="translateBtn">Translate to English</button>
+    </div>
+
+    <script>
+        const form = document.getElementById('uploadForm');
+        const fileInput = document.getElementById('fileInput');
+        const fileInputLabel = document.getElementById('fileInputLabel');
+        const resultTextarea = document.getElementById('result');
+        const cameraBtn = document.getElementById('cameraBtn');
+        const preview = document.getElementById('preview');
+        const captureBtn = document.getElementById('captureBtn');
+        const translateBtn = document.getElementById('translateBtn');
+
+        fileInputLabel.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const file = fileInput.files[0];
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                const response = await fetch('/ocr/malayalam', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+                if (response.ok) {
+                    resultTextarea.value = data.text;
+                } else {
+                    resultTextarea.value = 'Error: ' + data.error;
+                }
+            } catch (error) {
+                resultTextarea.value = 'An error occurred: ' + error.message;
+            }
+        });
+
+        cameraBtn.addEventListener('click', async () => {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+
+                preview.srcObject = stream;
+                preview.style.display = 'block';
+                captureBtn.style.display = 'block';
+
+                captureBtn.addEventListener('click', async () => {
+                    const canvas = document.createElement('canvas');
+                    const context = canvas.getContext('2d');
+                    const videoTrack = preview.srcObject.getVideoTracks()[0];
+
+                    canvas.width = preview.videoWidth;
+                    canvas.height = preview.videoHeight;
+
+                    context.drawImage(preview, 0, 0, canvas.width, canvas.height);
+
+                    videoTrack.stop();
+
+                    const imageData = canvas.toDataURL('image/jpeg');
+                    const blob = dataURItoBlob(imageData);
+                    const file = new File([blob], 'camera_image.jpg', { type: 'image/jpeg' });
+                    const formData2 = new FormData();
+                    formData2.append('file', file);
+                    try {
+                        const response = await fetch('/ocr/malayalam', {
+                            method: 'POST',
+                            body: formData2
+                        });
+
+                        const data = await response.json();
+                        if (response.ok) {
+                            resultTextarea.value = data.text;
+                        } else {
+                            resultTextarea.value = 'Error: ' + data.error;
+                        }
+                    } catch (error) {
+                        resultTextarea.value = 'An error occurred: ' + error.message;
+                    }
+                    fileInput.files = [file];
+                    form.submit();
+                });
+            } catch (error) {
+                resultTextarea.value = 'An error occurred: ' + error.message;
+            }
+        });
+
+        translateBtn.addEventListener('click', async () => {
+            const text = resultTextarea.value;
+            try {
+                const response = await fetch('/translate/malayalam-to-english', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ text })
+                });
+
+                const data = await response.json();
+                if (response.ok) {
+                    resultTextarea.value = data.translation;
+                } else {
+                    resultTextarea.value = 'Error: ' + data.error;
+                }
+            } catch (error) {
+                resultTextarea.value = 'An error occurred: ' + error.message;
+            }
+        });
+
+        function dataURItoBlob(dataURI) {
+            const byteString = atob(dataURI.split(',')[1]);
+            const mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+            const ab = new ArrayBuffer(byteString.length);
+            const ia = new Uint8Array(ab);
+            for (let i = 0; i < byteString.length; i++) {
+                ia[i] = byteString.charCodeAt(i);
+            }
+            return new Blob([ab], { type: mimeString });
+        }
+    </script>
+</body>
+</html>

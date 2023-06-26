@@ -14,3 +14,9 @@ uvicorn==0.20.0
 uvloop==0.17.0
 watchfiles==0.18.1
 websockets==10.4
+pytesseract==0.3.10
+googletrans==4.0.0-rc1
+pydantic==1.10.9
+image==1.5.33
+typing_extensions==4.3.0
+Pillow==9.1.1
