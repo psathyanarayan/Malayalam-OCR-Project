@@ -1,29 +1,25 @@
-# Use the official Python base image
-FROM python:3.10
+# Use the official Python image as the base image
+FROM python:3.10-slim-buster
 
 # Set the working directory in the container
 WORKDIR /app
 
-# Copy the requirements file
-COPY requirements.txt .
+# Copy the requirements file to the working directory
+COPY poetry.lock pyproject.toml /app/
 
-# Install Tesseract OCR and its dependencies
-RUN apt-get update \
-    && apt-get install -y tesseract-ocr \
-    && apt-get install -y libtesseract-dev \
-    && apt-get clean
+# Install Poetry and project dependencies
+RUN pip install poetry && \
+    poetry config virtualenvs.create false && \
+    poetry install --no-interaction --no-ansi
 
-# Install the required Python packages
-RUN pip install --no-cache-dir -r requirements.txt
+# Copy the rest of the application code to the working directory
+COPY . /app
 
-# Install Malayalam language data for Tesseract
-RUN apt-get install -y tesseract-ocr-mal
+# Set the path to the Tesseract executable
+ENV TESSERACT_PATH=/usr/bin/tesseract
 
-# Copy the FastAPI app code into the container
-COPY . .
-
-# Expose the FastAPI port
+# Expose port 8000
 EXPOSE 8000
 
-# Start the FastAPI server
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Start the FastAPI application using uvicorn
+CMD ["poetry", "run", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
