@@ -18,3 +18,4 @@ pytesseract==0.3.10
 googletrans==4.0.0-rc1
 image==1.5.33
 Pillow==9.1.1
+python-multipart==0.0.6
