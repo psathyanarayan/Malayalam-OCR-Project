@@ -17,5 +17,4 @@ websockets==10.4
 pytesseract==0.3.10
 googletrans==4.0.0-rc1
 image==1.5.33
-typing_extensions==4.3.0
 Pillow==9.1.1
