@@ -11,7 +11,7 @@ from googletrans import Translator
 
 
 # Set the path to the Tesseract executable
-pytesseract.pytesseract.tesseract_cmd = 'tesseract'
+pytesseract.pytesseract.tesseract_cmd = './tesseract'
 
 app = FastAPI()
 
