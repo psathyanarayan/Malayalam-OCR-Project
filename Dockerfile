@@ -1,27 +1,24 @@
-# Use the official Python base image
+# Use the official Python image as the base image
 FROM python:3.10-slim
 
 # Set the working directory in the container
 WORKDIR /app
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y \
-    tesseract-ocr \
-    tesseract-ocr-malayalam
+# Install Tesseract OCR and other necessary packages
+RUN apt-get update \
+    && apt-get install -y tesseract-ocr \
+    && apt-get clean
 
-# Copy the requirements.txt file
-COPY poetry.lock pyproject.toml /app/
+# Copy the project files to the working directory
+COPY . /app
 
-# Install Poetry and project dependencies
-RUN pip install poetry && \
-    poetry config virtualenvs.create false && \
-    poetry install --no-interaction --no-ansi
+# Install the project dependencies
+RUN pip install --no-cache-dir poetry \
+    && poetry config virtualenvs.create false \
+    && poetry install --no-interaction --no-ansi
 
-# Copy the rest of the application code
-COPY . /app/
-
-# Expose the port the application will run on
+# Expose the port that the FastAPI server will listen on
 EXPOSE 8000
 
-# Start the application
-CMD ["poetry", "run", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Start the FastAPI server using Uvicorn
+CMD ["poetry", "run", "uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]
