@@ -3,6 +3,7 @@ FROM python:3.10-slim
 
 # Set the working directory in the container
 WORKDIR /app
+
 # Install Tesseract OCR and other necessary packages
 RUN apt-get update \
     && apt-get install -y tesseract-ocr \
@@ -20,7 +21,10 @@ RUN pip install --no-cache-dir poetry \
 # Expose the port that the FastAPI server will listen on
 EXPOSE 8000
 
-# Start the FastAPI server using Uvicorn
-# CMD ["sh", "-c", "poetry run uvicorn app:app --host 0.0.0.0 --port $PORT"]
-CMD bash -c "uvicorn main:app --host 0.0.0.0"
+# Create a shell script to start the server
+RUN echo "#!/usr/bin/env bash" > /start.sh
+RUN echo "uvicorn main:app --host 0.0.0.0 --port \$PORT" >> /start.sh
+RUN chmod +x /start.sh
 
+# Start the FastAPI server using the shell script
+CMD ["/start.sh"]
