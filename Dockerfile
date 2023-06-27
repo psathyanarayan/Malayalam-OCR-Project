@@ -22,5 +22,5 @@ EXPOSE 8000
 
 # Start the FastAPI server using Uvicorn
 # CMD ["sh", "-c", "poetry run uvicorn app:app --host 0.0.0.0 --port $PORT"]
-CMD bash -c "uvicorn main:app --host 0.0.0.0 --port $PORT"
+CMD bash -c "uvicorn main:app --host 0.0.0.0"
 
