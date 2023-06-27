@@ -24,6 +24,6 @@ RUN pip install --no-cache-dir poetry \
 EXPOSE 8000
 
 # Start the FastAPI server using Uvicorn
-CMD ["sh", "-c", "poetry run uvicorn app:app --host 0.0.0.0 --port $PORT"]
+CMD ["sh", "-c", "poetry run uvicorn app:app --host 0.0.0.0 --port 8000"]
 
 
