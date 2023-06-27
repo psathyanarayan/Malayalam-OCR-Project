@@ -23,7 +23,7 @@ EXPOSE 8000
 
 # Create a shell script to start the server
 RUN echo "#!/usr/bin/env bash" > /start.sh
-RUN echo "uvicorn main:app --host 0.0.0.0 --port \$PORT" >> /start.sh
+RUN echo "uvicorn main:app" >> /start.sh
 RUN chmod +x /start.sh
 
 # Start the FastAPI server using the shell script
