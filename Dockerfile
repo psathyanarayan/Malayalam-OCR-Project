@@ -19,7 +19,7 @@ RUN pip install --no-cache-dir poetry \
     && pip install --no-cache-dir --upgrade -r /app/requirements.txt
 
 # Expose the port that the FastAPI server will listen on
-EXPOSE 8000
+# EXPOSE 8000
 
 # Create a shell script to start the server
 RUN echo "#!/usr/bin/env bash" > /start.sh
