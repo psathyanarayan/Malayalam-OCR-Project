@@ -4,7 +4,7 @@ FROM python:3.10-slim
 # Set the working directory in the container
 WORKDIR /app
 
-ENV PORT 8080
+ENV PORT 8000
 
 
 # Install Tesseract OCR and other necessary packages
@@ -24,6 +24,6 @@ RUN pip install --no-cache-dir poetry \
 EXPOSE 8000
 
 # Start the FastAPI server using Uvicorn
-CMD ["sh", "-c", "poetry run uvicorn app:app --host 0.0.0.0 --port 8000"]
+CMD ["sh", "-c", "poetry run uvicorn app:app --host 0.0.0.0 --port $PORT"]
 
 
